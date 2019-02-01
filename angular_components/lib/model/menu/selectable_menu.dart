@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:quiver/core.dart' show Optional;
 import 'package:built_collection/built_collection.dart';
 import 'package:meta/meta.dart';
 import 'package:observable/observable.dart';
@@ -56,6 +55,7 @@ class MenuItemGroupWithSelection<SelectionItemType>
 class SelectableMenuItem<ItemType> extends PropertyChangeNotifier
     implements MenuItem {
   Function _action;
+  IconVisibility _secondaryIconVisibility;
   SelectableOption _selectableState;
 
   /// Converts [ItemType] into a string.
@@ -80,6 +80,9 @@ class SelectableMenuItem<ItemType> extends PropertyChangeNotifier
   final Icon icon;
 
   @override
+  final Icon secondaryIcon;
+
+  @override
   final MenuModel subMenu;
 
   @override
@@ -97,22 +100,11 @@ class SelectableMenuItem<ItemType> extends PropertyChangeNotifier
   @override
   final String secondaryLabel;
 
-  /// The constructor for a selectable [MenuItem].
-  ///
-  /// Selectable menu items can be managed with a [SelectionModel] from within
-  /// [MenuItemGroupWithSelection]. Selected menu items are marked in the UI and
-  /// can change the selection via user interactions.
-  ///
-  /// [itemSuffixes] - the list of suffixes rendered after the item content.
-  ///
-  /// [itemSuffix] - singular item suffix to be rendered after the item content;
-  ///     convenient way to pass a single item suffix in rather than
-  ///     constructing an ObservableList and using [itemSuffixes]. If
-  ///     [itemSuffixes] is also passed in, [itemSuffixes] takes precedence.
   SelectableMenuItem(
       {@required this.value,
       this.itemRenderer = defaultItemRenderer,
       this.icon,
+      @Deprecated('Please use itemSuffixes instead') this.secondaryIcon,
       this.subMenu,
       this.tooltip,
       this.secondaryLabel,
@@ -121,17 +113,17 @@ class SelectableMenuItem<ItemType> extends PropertyChangeNotifier
       Function action = _noOp,
       SelectableOption selectableState = SelectableOption.Selectable,
       bool shouldSelectOnItemClick,
-      MenuItemAffix itemSuffix,
       ObservableList<MenuItemAffix> itemSuffixes})
       : _action = action,
         _selectableState = selectableState,
+        _secondaryIconVisibility = IconVisibility.visible,
         shouldSelectOnItemClick = shouldSelectOnItemClick ?? subMenu == null,
-        itemSuffixes = itemSuffixes ??
-            ObservableList<MenuItemAffix>.from(
-                Optional.fromNullable(itemSuffix)),
+        itemSuffixes = itemSuffixes ?? ObservableList<MenuItemAffix>(),
         cssClasses = BuiltList<String>(cssClasses ?? const []) {
-    assert(itemSuffix == null || itemSuffixes == null,
-        'Only one of itemSuffix or itemSuffixes should be provided');
+    if (secondaryIcon != null) {
+      this.itemSuffixes.add(
+          IconAffix(icon: secondaryIcon, visibility: _secondaryIconVisibility));
+    }
   }
 
   @override
@@ -144,6 +136,12 @@ class SelectableMenuItem<ItemType> extends PropertyChangeNotifier
   bool get hasIcon => icon != null;
 
   @override
+  bool get hasSecondaryIcon => itemSuffixes.any((suffix) => suffix.isVisible);
+
+  @override
+  bool get hasSecondaryHoverIcon => uiHoverIcon != null;
+
+  @override
   bool get hasSubMenu => subMenu != null;
 
   @override
@@ -151,6 +149,14 @@ class SelectableMenuItem<ItemType> extends PropertyChangeNotifier
 
   @override
   Icon get uiIcon => icon;
+
+  @override
+  Icon get uiHoverIcon {
+    final suffix = itemSuffixes.firstWhere(
+        (suffix) => suffix is IconAffix && suffix.isVisibleOnHover,
+        orElse: () => null);
+    return (suffix as IconAffix).icon;
+  }
 
   @override
   String get uiDisplayName => label;
@@ -177,6 +183,12 @@ class SelectableMenuItem<ItemType> extends PropertyChangeNotifier
 
   @override
   bool get hasSecondaryLabel => secondaryLabel != null;
+
+  /// Visibility state of the secondary icon.
+  ///
+  /// In a menu item, the secondary icon appears to the right of the text
+  /// content.
+  IconVisibility get secondaryIconVisibility => _secondaryIconVisibility;
 
   /// Display state of this menu item.
   SelectableOption get selectableState => _selectableState;

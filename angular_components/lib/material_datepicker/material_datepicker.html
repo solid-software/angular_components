@@ -22,7 +22,9 @@
     [source]="container"
     [(visible)]="popupVisible"
     [preferredPositions]="preferredPositions">
-  <focus-trap>
+  <focus-trap (keypress)="onKeyPress"
+              (keydown)="onKeyDown"
+              (keyup)="onKeyUp">
     <div class="popup-content" [class.compact]="compact" *deferredContent>
       <div class="inner-label-wrapper">
           <span *ngIf="presetDates.isNotEmpty" class="inner-label" >{{labelMsg}}</span>

@@ -6,8 +6,6 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:angular/angular.dart';
-import 'package:angular/meta.dart';
-import 'package:meta/meta.dart';
 import 'package:angular_components/laminate/overlay/constants.dart';
 import 'package:angular_components/laminate/popup/popup.dart';
 import 'package:angular_components/src/material_tooltip/tooltip_controller.dart';
@@ -17,7 +15,7 @@ import 'package:angular_components/utils/browser/events/events.dart';
 import 'tooltip_source.dart' show tooltipShowDelay;
 
 /// A directive that marks the target of a tooltip and handles showing and
-/// hiding a tooltip on hover, click, and focus.
+/// hiding a tooltip on hover, click, enter, and space.
 ///
 /// This directive is used in conjunction with a [Tooltip] Component. Such as
 /// the [MaterialInkTooltipComponent], which gives full control over
@@ -38,13 +36,6 @@ class MaterialTooltipTargetDirective extends TooltipBehavior
       : super(
             domPopupSourceFactory, viewContainerRef, element, changeDetector) {
     this.element = element;
-  }
-
-  /// Show tooltip on focus to allow keyboard users to see tooltip contents.
-  @visibleForTemplate
-  @HostListener('focus')
-  void onFocus() {
-    showTooltipWithDelay();
   }
 
   @override
@@ -76,8 +67,7 @@ abstract class TooltipBehavior extends TooltipTarget {
     _show = DelayedAction(tooltipShowDelay, showTooltip);
   }
 
-  @protected
-  @visibleForTesting
+  @HostListener('keyup')
   void showTooltipWithDelay() {
     _show.start();
   }
@@ -111,28 +101,17 @@ abstract class TooltipBehavior extends TooltipTarget {
     _isMouseInside = false;
     hideTooltip();
   }
-
-  /// Ensure the tooltip is deactivated when the popup closes.
-  ///
-  /// This is necessary because the popup can close itself and has no concept
-  /// of tooltip activate / deactivate.
-  @override
-  void onClose() {
-    super.onClose();
-    hideTooltip(immediate: true);
-  }
 }
 
 /// A directive that marks the target of a tooltip and handles activating on
 /// mouse over (with delay), click, enter, and space.
 ///
-/// This directive is slightly different from [MaterialPaperTooltipComponent].
-/// Click / key events open the tooltip with no delay, and tooltips do not open
-/// on focus.
+/// This directive is slightly different from [MaterialTooltipTargetDirective]
+/// as click and key events make tooltips appear with no delay.
 ///
 /// This directive is used in conjunction with a [Tooltip] Component. Such as
-/// the [MaterialPaperTooltipComponent], which gives full control over the
-/// content of a simple tooltip.
+/// the [MaterialInkTooltipComponent], which gives full control over the content
+/// of a simple tooltip.
 @Directive(
   selector: '[clickableTooltipTarget]',
   exportAs: 'tooltipTarget',
@@ -222,23 +201,10 @@ abstract class TooltipTarget extends PopupSourceDirective {
     _tooltip = component;
   }
 
-  String _id;
   @override
   set popupId(String id) {
     super.popupId = id;
-    _id = id;
     if (id == null) return;
-  }
-
-  @override
-  void onOpen() {
-    if (_id == null) return;
-    _element.setAttribute('aria-describedby', _id);
-  }
-
-  @override
-  void onClose() {
-    if (_id == null) return;
-    _element.attributes.remove('aria-describedby');
+    _element.setAttribute('aria-describedby', id);
   }
 }

@@ -158,11 +158,9 @@ abstract class BasePortalHost implements PortalHost {
     }
     if (portal is ComponentPortal) {
       _attachedPortal = portal;
-      portal.setAttachedHost(this);
       return attachComponentPortal(portal);
     } else if (portal is TemplatePortal) {
       _attachedPortal = portal;
-      portal.setAttachedHost(this);
       return attachTemplatePortal(portal);
     } else if (portal == null) {
       throw ArgumentError.notNull('portal');
@@ -244,6 +242,7 @@ class PortalHostDirective extends BasePortalHost {
   Future<ComponentRef> attachComponentPortal(ComponentPortal portal) {
     // By default, use the portal host as the origin. If [portal.origin] is set
     // however, then use that.
+    portal.setAttachedHost(this);
     var viewContainerRef = _viewContainerRef;
     if (portal.origin != null) {
       viewContainerRef = portal.origin;
@@ -257,6 +256,7 @@ class PortalHostDirective extends BasePortalHost {
 
   @override
   Future<Map<String, dynamic>> attachTemplatePortal(TemplatePortal portal) {
+    portal.setAttachedHost(this);
     final viewRef = _viewContainerRef.createEmbeddedView(portal.template);
     portal.locals.forEach(viewRef.setLocal);
     setPortalDisposer(_viewContainerRef.clear);

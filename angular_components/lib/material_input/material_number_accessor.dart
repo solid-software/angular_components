@@ -199,7 +199,7 @@ class CheckIntegerValidator implements Validator {
     return null;
   }
 
-  static String numberIsNotIntegerMsg() => Intl.message('Enter a whole number',
+  static String numberIsNotIntegerMsg() => Intl.message('Enter an integer',
       desc: 'Error message when input number is not an integer.',
       meaning: 'Error message when input number is not an integer.');
 }

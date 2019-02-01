@@ -11,11 +11,7 @@ import 'package:angular_components/model/selection/selection_options.dart';
 
 /// Handles toggling selection of a range of options when shift is held down
 /// while clicking on the end value.
-//
-// This class must support handling the deselect item as well as normal items,
-// so it cannot implement [ActivationHandler<T>].
-abstract class ShiftClickSelectionMixin<T>
-    implements ActivationHandler<dynamic /* T | String */ > {
+abstract class ShiftClickSelectionMixin<T> implements ActivationHandler<T> {
   T _pivot;
 
   SelectionModel<T> get selection;
@@ -52,11 +48,9 @@ abstract class ShiftClickSelectionMixin<T>
   /// If [event] is not a [MouseEvent] it will not be handled. This method
   /// does handle mouse events even if shift is not held down.
   @override
-  bool handle(UIEvent event, dynamic activatedValue) {
+  bool handle(UIEvent event, T activatedValue) {
     if (selection is! MultiSelectionModel || event is! MouseEvent) return false;
-    // The deselect label is never shown with a MultiSelectionModel, so it's
-    // safe to assume activatedValue is of type T at this point.
-    _handleClick(event, activatedValue as T);
+    _handleClick(event, activatedValue);
     return true;
   }
 }

@@ -34,6 +34,12 @@ class DelegatingMenuItem<SubMenuType> implements MenuItem<SubMenuType> {
   bool get hasIcon => _delegate.hasIcon;
 
   @override
+  bool get hasSecondaryHoverIcon => _delegate.hasSecondaryHoverIcon;
+
+  @override
+  bool get hasSecondaryIcon => _delegate.hasSecondaryIcon;
+
+  @override
   bool get hasSubMenu => _delegate.hasSubMenu;
 
   @override
@@ -52,6 +58,9 @@ class DelegatingMenuItem<SubMenuType> implements MenuItem<SubMenuType> {
   Function get nullAwareActionHandler => _delegate.nullAwareActionHandler;
 
   @override
+  Icon get secondaryIcon => _delegate.secondaryIcon;
+
+  @override
   bool get showTooltip => _delegate.showTooltip;
 
   @override
@@ -62,6 +71,9 @@ class DelegatingMenuItem<SubMenuType> implements MenuItem<SubMenuType> {
 
   @override
   String get uiDisplayName => _delegate.uiDisplayName;
+
+  @override
+  Icon get uiHoverIcon => _delegate.uiHoverIcon;
 
   @override
   Icon get uiIcon => _delegate.uiIcon;

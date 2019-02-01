@@ -8,7 +8,6 @@ import 'dart:html';
 import 'package:angular/angular.dart';
 import 'package:angular_components/focus/focus_trap.dart';
 import 'package:angular_components/laminate/components/modal/modal.dart';
-import 'package:angular_components/model/a11y/keyboard_handler_mixin.dart';
 import 'package:angular_components/utils/browser/dom_service/dom_service.dart';
 import 'package:angular_components/utils/disposer/disposer.dart';
 
@@ -31,9 +30,7 @@ import 'package:angular_components/utils/disposer/disposer.dart';
   directives: [FocusTrapComponent, NgIf],
   changeDetection: ChangeDetectionStrategy.OnPush,
 )
-class MaterialDialogComponent
-    with KeyboardHandlerMixin
-    implements AfterContentChecked, OnDestroy {
+class MaterialDialogComponent implements AfterContentChecked, OnDestroy {
   final HtmlElement _rootElement;
   final DomService _domService;
   final ChangeDetectorRef _changeDetector;
@@ -51,9 +48,7 @@ class MaterialDialogComponent
   bool _shouldListenForFullscreenChanges = false;
 
   MaterialDialogComponent(this._rootElement, this._domService,
-      this._changeDetector, @Optional() this._modal) {
-    escapeHandler = _defaultEscapeHandler;
-  }
+      this._changeDetector, @Optional() this._modal);
 
   @ViewChild('main', read: HtmlElement)
   set main(HtmlElement element) {
@@ -66,11 +61,6 @@ class MaterialDialogComponent
       _setHeaderFooterScrollBorder();
     }));
   }
-
-  /// Function to handle escape key events from the dialog. By default it tries
-  /// to close the parent modal, if any.
-  @Input()
-  KeyboardEventHandler escapeHandler;
 
   /// Error to show up in the error section of the dialog.
   @Input()
@@ -153,20 +143,6 @@ class MaterialDialogComponent
     if (_isInFullscreenMode != isInFullscreenMode) {
       _isInFullscreenMode = isInFullscreenMode;
       _isInFullscreenModeStreamController.add(isInFullscreenMode);
-    }
-  }
-
-  @override
-  void handleEscapeKey(KeyboardEvent event) {
-    if (escapeHandler != null) {
-      escapeHandler(event);
-    }
-  }
-
-  void _defaultEscapeHandler(KeyboardEvent event) {
-    if (_modal != null) {
-      event.preventDefault();
-      _modal.close();
     }
   }
 

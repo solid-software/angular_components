@@ -10,7 +10,6 @@ import 'package:intl/intl.dart';
 import 'package:quiver/time.dart';
 import 'package:angular_components/button_decorator/button_decorator.dart';
 import 'package:angular_components/content/deferred_content.dart';
-import 'package:angular_components/focus/focus.dart';
 import 'package:angular_components/focus/focus_trap.dart';
 import 'package:angular_components/focus/keyboard_only_focus_indicator.dart';
 import 'package:angular_components/interfaces/has_disabled.dart';
@@ -20,15 +19,14 @@ import 'package:angular_components/material_button/material_button.dart';
 import 'package:angular_components/material_datepicker/comparison.dart';
 import 'package:angular_components/material_datepicker/comparison_option.dart';
 import 'package:angular_components/material_datepicker/config.dart';
-import 'package:angular_components/material_datepicker/date_range_editor_host.dart';
 import 'package:angular_components/material_datepicker/date_range_editor.dart';
-import 'package:angular_components/material_datepicker/model.dart';
 import 'package:angular_components/material_datepicker/module.dart';
 import 'package:angular_components/material_datepicker/next_prev_buttons.dart';
 import 'package:angular_components/material_datepicker/preset.dart';
 import 'package:angular_components/material_datepicker/range.dart';
 import 'package:angular_components/material_popup/material_popup.dart';
 import 'package:angular_components/material_select/dropdown_button.dart';
+import 'package:angular_components/model/a11y/keyboard_handler_mixin.dart';
 import 'package:angular_components/model/date/date.dart';
 import 'package:angular_components/model/date/date_formatter.dart';
 import 'package:angular_components/model/observable/observable.dart';
@@ -91,7 +89,7 @@ const _defaultMaxHeight = 600;
     ExistingProvider(PopupSizeProvider, MaterialDateRangePickerComponent),
   ],
 )
-class MaterialDateRangePickerComponent
+class MaterialDateRangePickerComponent extends KeyboardHandlerMixin
     implements
         HasDisabled,
         OnInit,
@@ -99,7 +97,7 @@ class MaterialDateRangePickerComponent
         OnDestroy,
         DateRangeEditorHost,
         PopupSizeProvider {
-  Focusable _dateRangeEditor;
+  DateRangeEditorComponent _dateRangeEditor;
   bool _focusOnDateRangeEditorInit = false;
   PopupSizeProvider _popupSizeProvider;
 
@@ -538,6 +536,12 @@ class MaterialDateRangePickerComponent
   num getMinWidth(num positionX, num viewportWidth) =>
       _popupSizeProvider?.getMinWidth(positionX, viewportWidth);
 
+  @override
+  void handleEscapeKey(KeyboardEvent event) {
+    close();
+    focusOnClose.focus();
+  }
+
   /// Whether or not the given range is "complicated" -- i.e. if it has a
   /// comparison or a custom range.
   bool _isPreset(DatepickerComparison cmp) =>
@@ -593,7 +597,7 @@ class MaterialDateRangePickerComponent
     _formattedComparison = _getFormattedComparison(value);
   }
 
-  void dateRangeEditorCreated(Focusable editor) {
+  void dateRangeEditorCreated(DateRangeEditorComponent editor) {
     _dateRangeEditor = editor;
     if (_dateRangeEditor != null && _focusOnDateRangeEditorInit) {
       _focusOnDateRangeEditorInit = false;

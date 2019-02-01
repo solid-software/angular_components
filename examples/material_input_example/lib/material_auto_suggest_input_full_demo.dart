@@ -92,9 +92,9 @@ class MaterialAutoSuggestInputFullDemoComponent {
   final multiModel = SelectionModel<List>.multi();
 
   final suggestionOptions =
-      ExampleSelectionOptions.withOptionGroups(_optionGroups);
+      ExampleSelectionOptions<List<int>>.withOptionGroups(_optionGroups);
   final suggestionOptionsWithItemRenderer =
-      ExampleSelectionOptions.withOptionGroups(_optionGroups,
+      ExampleSelectionOptions<List<int>>.withOptionGroups(_optionGroups,
           toFilterableString: _numberNameRenderer);
 
   final emptySuggestionOptions = StringSelectionOptions(const <String>[]);
@@ -206,16 +206,16 @@ class ExampleLabelRendererComponent implements RendersValue {
   }
 }
 
-class ExampleSelectionOptions extends StringSelectionOptions<List<int>>
-    implements Selectable<List<int>> {
-  ExampleSelectionOptions(List<List<int>> options) : super(options);
+class ExampleSelectionOptions<T> extends StringSelectionOptions<T>
+    implements Selectable {
+  ExampleSelectionOptions(List<T> options) : super(options);
   ExampleSelectionOptions.withOptionGroups(List<OptionGroup> optionGroups,
-      {ItemRenderer<List<int>> toFilterableString})
+      {ItemRenderer<T> toFilterableString})
       : super.withOptionGroups(optionGroups,
             toFilterableString: toFilterableString);
   @override
-  SelectableOption getSelectable(List<int> item) {
-    if (item.contains(13)) {
+  SelectableOption getSelectable(item) {
+    if (item is List && item.contains(13)) {
       return SelectableOption.Disabled;
     }
     return SelectableOption.Selectable;

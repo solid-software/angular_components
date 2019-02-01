@@ -21,7 +21,7 @@ import 'material_dropdown_select.dart';
     ExistingProvider.forToken(ngValueAccessor, DropdownSelectValueAccessor),
   ],
 )
-class DropdownSelectValueAccessor<T> extends BaseDropdownSelectValueAccessor<T>
+class DropdownSelectValueAccessor extends BaseDropdownSelectValueAccessor
     implements ControlValueAccessor, OnDestroy {
   StreamSubscription _selectionChangesSub;
   DropdownSelectValueAccessor(MaterialDropdownSelectComponent select)
@@ -66,13 +66,12 @@ class DropdownSelectValueAccessor<T> extends BaseDropdownSelectValueAccessor<T>
         ngValueAccessor, MultiDropdownSelectValueAccessor),
   ],
 )
-class MultiDropdownSelectValueAccessor<T>
-    extends BaseDropdownSelectValueAccessor<T>
+class MultiDropdownSelectValueAccessor extends BaseDropdownSelectValueAccessor
     implements ControlValueAccessor, OnDestroy {
-  StreamSubscription<List<SelectionChangeRecord<T>>> selectionChangesSub;
+  var selectionChangesSub;
 
-  MultiDropdownSelectValueAccessor(MaterialDropdownSelectComponent<T> select)
-      : super(select, MultiSelectionModel<T>());
+  MultiDropdownSelectValueAccessor(MaterialDropdownSelectComponent select)
+      : super(select, MultiSelectionModel());
 
   @override
   void registerOnChange(callback) {
@@ -101,11 +100,11 @@ class MultiDropdownSelectValueAccessor<T>
 
 /// Base [ControlValueAccessor] for material dropdown select for common logic
 /// between single, and multiple selection dropdowns.
-abstract class BaseDropdownSelectValueAccessor<T>
+abstract class BaseDropdownSelectValueAccessor
     implements ControlValueAccessor, OnDestroy {
-  final MaterialDropdownSelectComponent<T> _select;
+  final MaterialDropdownSelectComponent _select;
   @protected
-  final SelectionModel<T> selectionModel;
+  final SelectionModel selectionModel;
   StreamSubscription _visibileSub;
   bool initialized = false;
 

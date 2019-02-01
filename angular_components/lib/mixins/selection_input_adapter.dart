@@ -77,9 +77,7 @@ abstract class SelectionInputAdapter<T> implements SelectionContainer<T> {
     } else if (value is List<T>) {
       options = StringSelectionOptions(value, toFilterableString: itemRenderer);
     } else {
-      throw ArgumentError(
-          'Unsupported selection options type; value must be null, '
-          'SelectionOptions<$T>, or List<$T>, but is ${value.runtimeType}');
+      throw ArgumentError('Unsupported selection options type.');
     }
   }
 }

@@ -80,9 +80,11 @@ $left-icon-width: $mat-grid * 4;
 
 /// Applies a max-width to the material chips. If the max-width exceeded,
 /// content will be elided.
-@mixin material-chip-max-width($max-chip-width) {
+@mixin material-chip-max-width($max-chip-width: null) {
   ::ng-deep material-chip {
-    max-width: $max-chip-width;
+    @if $max-chip-width {
+      max-width: $max-chip-width;
+    }
   }
 }
 
@@ -105,6 +107,13 @@ $main-selected-bg-color: $mat-gray-600;
 
 $emphasis-hover-bg-color: $mat-blue-700;
 $emphasis-selected-bg-color: $mat-blue-900;
+
+/// Use this mixin to align the chips container.
+@mixin material-chips-margin($margin: 0) {
+  ::ng-deep .material-chips-root {
+    margin: $margin;
+  }
+}
 
 /// Use this mixin to change the background color of the chips container.
 @mixin material-chips-background-color($color) {
@@ -179,10 +188,6 @@ $emphasis-selected-bg-color: $mat-blue-900;
       ::ng-deep .delete-icon {
         fill: $mat-white;
       }
-    }
-
-    ::ng-deep .delete-icon:focus {
-      fill: $mat-gray-300;
     }
   }
 }

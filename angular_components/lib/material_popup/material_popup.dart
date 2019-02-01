@@ -9,7 +9,6 @@ import 'dart:math';
 import 'package:angular/angular.dart';
 import 'package:meta/meta.dart';
 import 'package:angular_components/content/deferred_content_aware.dart';
-import 'package:angular_components/focus/focus_interface.dart';
 import 'package:angular_components/laminate/enums/alignment.dart';
 import 'package:angular_components/laminate/enums/visibility.dart'
     as visibility;
@@ -22,7 +21,6 @@ import 'package:angular_components/laminate/popup/popup.dart';
 import 'package:angular_components/mixins/material_dropdown_base.dart';
 import 'package:angular_components/model/ui/toggle.dart';
 import 'package:angular_components/utils/async/async.dart';
-import 'package:angular_components/utils/browser/dom_service/angular_2.dart';
 import 'package:angular_components/utils/disposer/disposer.dart';
 import 'package:angular_components/utils/id_generator/id_generator.dart';
 
@@ -108,7 +106,6 @@ class MaterialPopupComponent extends Object
   final Disposer _disposer = Disposer.oneShot();
   final NgZone _ngZone;
   final OverlayService _overlayService;
-  final DomService _domService;
   PopupHierarchy _hierarchy;
 
   final List<RelativePosition> _defaultPreferredPositions;
@@ -244,7 +241,6 @@ class MaterialPopupComponent extends Object
       @Attribute('role') String role,
       this._ngZone,
       this._overlayService,
-      this._domService,
       this._zIndexer,
       @Inject(defaultPopupPositions) this._defaultPreferredPositions,
       @Inject(overlayRepositionLoop) this._useRepositionLoop,
@@ -416,6 +412,18 @@ class MaterialPopupComponent extends Object
   @override
   void onAutoDismiss(Event event) {
     close();
+    // If user tabs out of the popup, restore focus on the popup source element
+    // instead of some seemingly random DOM location.
+    if (state.source is ElementPopupSource &&
+        event is FocusEvent &&
+        event.target is Element &&
+        (event.target as Element)
+            .classes
+            .contains(overlayFocusablePlaceholderClassName)) {
+      scheduleMicrotask(() {
+        (state.source as ElementPopupSource).focus();
+      });
+    }
     _onAutoDismissed.add(event);
   }
 
@@ -563,22 +571,6 @@ class MaterialPopupComponent extends Object
     // Stop the reposition loop (if it's running).
     if (_repositionLoopId != null) {
       _stopRepositionLoop();
-    }
-
-    // If user tabs out of the popup or if the focus is inside of popup when the
-    // popup closes, restore focus on the popup source element instead of some
-    // seemingly random DOM location.
-    // TODO(google): removed the islastTriggerWithKeyboard to better support
-    // mouse/keyboard mixed interactions.
-    if (state.source is Focusable && hierarchy.islastTriggerWithKeyboard) {
-      _domService.scheduleWrite(() {
-        if (window.document.activeElement.classes
-                .contains(overlayFocusablePlaceholderClassName) ||
-            _overlayRef.overlayElement
-                .contains(window.document.activeElement)) {
-          (state.source as Focusable).focus();
-        }
-      });
     }
 
     // Stop listening to autodismiss triggers.
