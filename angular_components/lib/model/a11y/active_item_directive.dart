@@ -52,7 +52,7 @@ class ActiveItemDirective implements AfterViewInit, OnDestroy {
   @override
   void ngAfterViewInit() {
     _initialized = true;
-    _scrollIntoViewIfNecessary();
+    // _scrollIntoViewIfNecessary();
   }
 
   /// Marks item as active from keyboard selection.
@@ -60,7 +60,7 @@ class ActiveItemDirective implements AfterViewInit, OnDestroy {
   set itemActive(bool value) {
     if (value == _active) return;
     _active = value;
-    _scrollIntoViewIfNecessary();
+    // _scrollIntoViewIfNecessary();
   }
 
   bool get _shouldScrollIntoView => _initialized && _active && !_hasHover;
